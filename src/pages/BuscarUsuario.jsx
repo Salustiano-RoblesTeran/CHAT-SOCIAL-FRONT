@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { buscarUsuario, enviarSolicitud } from "../helpers/ApiService";
+import { buscarUsuario, enviarSolicitud } from "../helpers/ApiService"; // Asumiendo que estas funciones existen en tu ApiService
 
 const BuscarUsuario = () => {
   const [nombre, setNombre] = useState("");
   const [usuarios, setUsuarios] = useState([]);
 
+  // Manejar la búsqueda de usuarios
   const handleBuscar = async () => {
     try {
-      const response = await buscarUsuario(nombre);
+      const response = await buscarUsuario(nombre); // Llamada a la API para buscar usuarios por nombre
+
       // Mapea usuarios para incluir el estado de la solicitud si no está definido
       const usuariosConEstado = response.usuarios.map((usuario) => ({
         ...usuario,
-        estadoSolicitud: usuario.solicitudesPendientes.find(
+        estadoSolicitud: usuario.solicitudesPendientes?.find(
           (solicitud) => solicitud.usuario === usuario._id
         )?.estado || "",
       }));
@@ -22,15 +24,16 @@ const BuscarUsuario = () => {
     }
   };
 
+  // Manejar el envío de la solicitud de amistad
   const handleEnviarSolicitud = async (contactoId, index) => {
     try {
-      const response = await enviarSolicitud(contactoId);
+      const response = await enviarSolicitud(contactoId); // Llamada a la API para enviar solicitud
       if (response.mensaje === "Solicitud de contacto enviada") {
         // Actualiza el estado a "Pendiente" si la solicitud se envió correctamente
         const nuevosUsuarios = [...usuarios];
         nuevosUsuarios[index].estadoSolicitud = "Pendiente";
         setUsuarios(nuevosUsuarios);
-      } else if (response.mensaje === "Solicitud ya existe o ya son contactos") {
+      } else {
         alert("La solicitud ya ha sido enviada o ya son contactos");
       }
     } catch (error) {
@@ -39,11 +42,13 @@ const BuscarUsuario = () => {
     }
   };
 
+  // Manejar la eliminación de un amigo
   const handleEliminarAmigo = (usuarioId) => {
     alert(`Eliminar amigo con ID: ${usuarioId}`);
-    // Lógica para eliminar amigo (puedes implementarla aquí)
+    // Aquí deberías implementar la lógica para eliminar un amigo si es necesario
   };
 
+  // Función para renderizar los botones de acción dependiendo del estado de la solicitud
   const renderButton = (usuario, index) => {
     switch (usuario.estadoSolicitud) {
       case "Pendiente":

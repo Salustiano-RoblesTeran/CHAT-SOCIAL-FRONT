@@ -42,29 +42,45 @@ export const buscarUsuario = async (nombre) => {
 
 // Enviar solicitud de contacto
 export const enviarSolicitud = async (contactoId) => {
+  try {
     const response = await fetch(`${API_URL}/${contactoId}/enviar-solicitud`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-token': token,
+        'x-token': token,  // Asegúrate de que el token sea válido y esté disponible
       },
-      body: JSON.stringify({ contactoId }), // Estructura correcta del cuerpo
+      body: JSON.stringify({ contactoId }), // Enviar el contactoId en el cuerpo de la solicitud
     });
-  
-    // Manejo de respuesta
+
+    // Manejo de la respuesta, en caso de que la solicitud no sea exitosa
     if (!response.ok) {
-      const errorData = await response.json(); // Obtén el cuerpo del error
-      throw new Error(errorData.mensaje || "Error al enviar solicitud"); // Mensaje de error
+      let errorMessage = "Error al enviar solicitud"; // Mensaje de error por defecto
+
+      // Intenta extraer el mensaje de error del cuerpo de la respuesta (si es un JSON)
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.mensaje || errorMessage; // Usa el mensaje del backend si está disponible
+      } catch (error) {
+        console.warn("No se pudo parsear la respuesta de error:", error);
+      }
+
+      throw new Error(errorMessage); // Lanza el error con el mensaje adecuado
     }
-  
-    return await response.json(); // Retorna la respuesta en caso de éxito
-  };
-  
+
+    // Si la solicitud fue exitosa, parsea la respuesta JSON
+    return await response.json();
+    
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error.message);
+    throw error; // Propaga el error para ser manejado en el frontend
+  }
+};
+
   
   
   export const aceptarSolicitud = async (contactoId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/usuarios/${contactoId}/aceptar-solicitud`, {
+      const response = await fetch(`${API_URL}/${contactoId}/aceptar-solicitud`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,15 +154,30 @@ export const obtenerMensajes = async (receptorId) => {
 
 // Obtener contactos
 export const obtenerContactos = async () => {
-    const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:3000/api/usuarios/contactos", {
+  const token = localStorage.getItem("token");
+  const url = `http://localhost:3000/api/usuarios/contactos`; // Ajusta la URL según tu backend
+
+  try {
+    const resp = await fetch(url, {
       method: "GET",
       headers: {
-        "x-token": token,
+        "Content-Type": "application/json",
+        "x-token": token, // Añades el token para autenticar la solicitud
       },
     });
-    return response.json();
-  };
+
+    if (!resp.ok) {
+      throw new Error("Error al obtener los contactos");
+    }
+
+    const data = await resp.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error al obtener los contactos");
+  }
+};
+
 
 
 
@@ -168,3 +199,26 @@ export const obtenerSolicitudes = async () => {
   const data = await response.json();
   return data; // Devuelve las solicitudes
 };
+
+export const obtenerNombre = async () => {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: {
+        'x-token': token, // Asegúrate de que `token` esté definido
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al obtener el nombre del usuario');
+    }
+
+    const data = await response.json();
+    return data; // Devuelve los datos del usuario (incluyendo el nombre)
+    
+  } catch (error) {
+    console.error(error.message);
+    throw new Error('No se pudo obtener el nombre del usuario');
+  }
+};
+

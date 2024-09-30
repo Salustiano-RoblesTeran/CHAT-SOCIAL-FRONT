@@ -1,15 +1,19 @@
-// src/screens/ContactosScreen.js
-import React, { useEffect, useState } from "react";
-import { obtenerContactos } from "../helpers/ApiService"; // Asegúrate de que esta función existe
+import { useNavigate } from "react-router-dom";
+import { obtenerContactos } from "../helpers/ApiService"
+import NavBar from "../components/NavBar";
+
+import { useState, useEffect } from "react";
 
 const ContactosScreen = () => {
   const [contactos, setContactos] = useState([]);
+  const navigate = useNavigate(); // Hook para redirigir
+
 
   useEffect(() => {
     const cargarContactos = async () => {
       try {
         const response = await obtenerContactos();
-        setContactos(response.contactos);
+        setContactos(response.amigos);
       } catch (error) {
         console.error("Error al cargar contactos:", error);
       }
@@ -19,8 +23,8 @@ const ContactosScreen = () => {
   }, []);
 
   const handleEnviarMensaje = (contactoId) => {
-    // Redirigir al chat con el contacto (usando history o un hook de navegación)
-    window.location.href = `/chat/${contactoId}`; // Cambia esto según tu configuración de rutas
+    // Redirigir al chat con el contacto usando React Router
+    navigate(`/chat/${contactoId}`);
   };
 
   return (
@@ -49,5 +53,6 @@ const ContactosScreen = () => {
     </div>
   );
 };
+
 
 export default ContactosScreen;

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authLogin, authRegistro } from '../helpers/ApiLogin';
 
-const LoginScreen = () => {
+const LoginScreen = ({ guardarUsuario }) => {
   const [showModal, setShowModal] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [alertType, setAlertType] = useState('');

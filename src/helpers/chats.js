@@ -1,4 +1,4 @@
-const url = `http://localhost:3000/api/chat/mis-chats`; // Asegúrate de que esta ruta exista en tu backend
+const url = `http://localhost:3000/api/chat/chats`; // Asegúrate de que esta ruta exista en tu backend
 
 const token = localStorage.getItem("token"); // No es necesario JSON.parse si es solo un string
 
