@@ -42,7 +42,7 @@ function App() {
         <Route path="/contactos" element={<ContactosScreen />} />
         <Route path="/editarUsuario" element={<EditarUsuario/>} />
         <Route path="/chat/:contactoId" element={<ChatScreen />} />
-        <Route path="/chat/mensajes/:chatId" element={<ChatScreen />} />
+        <Route path="/chat/conversacion/:chatId" element={<ChatScreen />} />
         <Route path="/notificaciones" element={<NotificacionesScreen />} />
 
       </Routes>

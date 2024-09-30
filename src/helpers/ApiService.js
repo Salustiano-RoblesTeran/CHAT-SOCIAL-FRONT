@@ -125,16 +125,23 @@ export const rechazarSolicitud = async (id, contactoId) => {
 // src/services/apiService.js
 
 // Obtener mensajes
-export const obtenerMensajes = async (receptorId) => {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:3000/api/chat/${receptorId}`, {
-      method: "GET",
-      headers: {
-        "x-token": token,
-      },
-    });
-    return response.json();
-  };
+export const obtenerChat = async (receptorId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:3000/api/chat/conversacion/${receptorId}`, {
+    method: "GET",
+    headers: {
+      "x-token": token,
+    },
+  });
+
+  // Verificar si la respuesta es correcta
+  if (!response.ok) {
+    throw new Error('Error al obtener el chat');
+  }
+
+  return response.json(); // Devuelve la respuesta JSON
+};
+
   
   // Enviar mensaje
   export const enviarMensaje = async (receptor, mensaje) => {

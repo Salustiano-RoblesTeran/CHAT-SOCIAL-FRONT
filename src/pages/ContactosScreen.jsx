@@ -1,13 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { obtenerContactos } from "../helpers/ApiService"
-import NavBar from "../components/NavBar";
-
+import { obtenerContactos } from "../helpers/ApiService";
 import { useState, useEffect } from "react";
 
 const ContactosScreen = () => {
   const [contactos, setContactos] = useState([]);
   const navigate = useNavigate(); // Hook para redirigir
-
 
   useEffect(() => {
     const cargarContactos = async () => {
@@ -24,8 +21,9 @@ const ContactosScreen = () => {
 
   const handleEnviarMensaje = (contactoId) => {
     // Redirigir al chat con el contacto usando React Router
-    navigate(`/chat/${contactoId}`);
+    navigate(`/chat/conversacion/${contactoId}`); // Asegúrate de que esta ruta sea la correcta
   };
+
 
   return (
     <div className="container mt-3">
@@ -53,6 +51,5 @@ const ContactosScreen = () => {
     </div>
   );
 };
-
 
 export default ContactosScreen;

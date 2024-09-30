@@ -1,55 +1,47 @@
-// src/components/Chat.js
-import React, { useState, useEffect } from "react";
-import { obtenerMensajes, enviarMensaje } from "../helpers/ApiService"; // Asegúrate de tener estas funciones en tu servicio
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom'; // Importar useParams
+import { obtenerChat } from '../helpers/ApiService'; // Asegúrate de que la ruta sea correcta
 
-const ChatScreen = ({ receptorId }) => {
-  const [mensajes, setMensajes] = useState([]);
-  const [nuevoMensaje, setNuevoMensaje] = useState("");
+const ChatScreen = () => {
+  const { contactoId } = useParams(); // Obtener contactoId de la URL
+  const [chat, setChat] = useState(null); // Estado para almacenar los mensajes del chat
+  const [cargando, setCargando] = useState(true); // Estado de carga
 
+  // Función para cargar los mensajes del chat usando el contactoId
   useEffect(() => {
-    const cargarMensajes = async () => {
+    const cargarChat = async () => {
       try {
-        const response = await obtenerMensajes(receptorId);
-        setMensajes(response.mensajes);
+        const chatObtenido = await obtenerChat(contactoId); // Usar el contactoId para obtener el chat
+        setChat(chatObtenido); // Guardar el chat en el estado
       } catch (error) {
-        console.error("Error al cargar mensajes:", error);
+        console.error("Error al cargar el chat:", error.message);
+      } finally {
+        setCargando(false); // Dejar de mostrar el mensaje de carga
       }
     };
 
-    cargarMensajes();
-  }, [receptorId]);
+    cargarChat();
+  }, [contactoId]); // Ejecutar este efecto cuando cambia contactoId
 
-  const handleEnviar = async () => {
-    if (!nuevoMensaje.trim()) return;
+  if (cargando) {
+    return <p>Cargando...</p>; // Mostrar mensaje de carga
+  }
 
-    try {
-      await enviarMensaje(receptorId, nuevoMensaje);
-      setMensajes((prevMensajes) => [
-        ...prevMensajes,
-        { emisor: "tú", mensaje: nuevoMensaje }, // Añade el nuevo mensaje localmente
-      ]);
-      setNuevoMensaje("");
-    } catch (error) {
-      console.error("Error al enviar mensaje:", error);
-    }
-  };
+  if (!chat) {
+    return <p>No se encontró el chat.</p>; // Mostrar mensaje si no hay chat
+  }
 
   return (
-    <div className="chat-container">
-      <div className="mensajes">
-        {mensajes.map((msg, index) => (
-          <div key={index} className={msg.emisor === "tú" ? "mensaje emisor" : "mensaje receptor"}>
-            {msg.mensaje}
-          </div>
+    <div>
+      <h3>Chat con {chat.otroUsuarioNombre}</h3>
+      <ul>
+        {chat.mensajes.map((mensaje) => (
+          <li key={mensaje._id}>
+            <strong>{mensaje.remitenteNombre}:</strong> {mensaje.contenido}
+            <small>{new Date(mensaje.createdAt).toLocaleTimeString()}</small>
+          </li>
         ))}
-      </div>
-      <input
-        type="text"
-        value={nuevoMensaje}
-        onChange={(e) => setNuevoMensaje(e.target.value)}
-        placeholder="Escribe un mensaje..."
-      />
-      <button onClick={handleEnviar}>Enviar</button>
+      </ul>
     </div>
   );
 };
